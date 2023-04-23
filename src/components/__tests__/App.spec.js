@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 
 import App from '@/App.vue';
 import { createPinia } from 'pinia/dist/pinia';
-import { RULE } from '@/domain/password/rules';
+import { RULE_CONFIG } from '@/domain/password/rules';
 import { useStrongPasswordStore } from '@/stores/strong-password';
 import { StrengthOption, StrengthOptionLabel } from '@/domain/password/strength-options';
 
@@ -43,63 +43,68 @@ describe('App', () => {
       },
       {
         password: 'A',
-        passedRules: [RULE.OneLetter],
+        passedRules: [RULE_CONFIG.OneLetter],
         description: 'one character'
       },
       {
         password: 'Ab',
-        passedRules: [RULE.OneLetter, RULE.UpperAndLower],
+        passedRules: [RULE_CONFIG.OneLetter, RULE_CONFIG.UpperAndLower],
         description: 'upper and lower char'
       },
       {
         password: '3a33',
-        passedRules: [RULE.OneLetter, RULE.OneNumber],
+        passedRules: [RULE_CONFIG.OneLetter, RULE_CONFIG.OneNumber],
         description: 'upper and lower char'
       },
       ...NOT_EXCLUSIVE_SPEC_SYMBOLS_LIST.split('').map((specialChar) => ({
         password: `a${specialChar}p`,
-        passedRules: [RULE.SpecialSymbol, RULE.OneLetter],
+        passedRules: [RULE_CONFIG.SpecialSymbol, RULE_CONFIG.OneLetter],
         description: 'special char'
       })),
       {
         password: 'aaaa',
-        passedRules: [RULE.OneLetter],
+        passedRules: [RULE_CONFIG.OneLetter],
         description: 'one character'
       },
       {
         password: 'aaaae',
-        passedRules: [RULE.OneLetter, RULE.LongerThan4],
+        passedRules: [RULE_CONFIG.OneLetter, RULE_CONFIG.LongerThan4],
         description: 'longer than 4'
       },
       {
         password: 'ab123',
-        passedRules: [RULE.OneLetter, RULE.OneNumber, RULE.LongerThan4],
+        passedRules: [RULE_CONFIG.OneLetter, RULE_CONFIG.OneNumber, RULE_CONFIG.LongerThan4],
         description: 'longer than 4'
       },
       {
         password: '###!!~~)',
-        passedRules: [RULE.SpecialSymbol, RULE.LongerThan4],
+        passedRules: [RULE_CONFIG.SpecialSymbol, RULE_CONFIG.LongerThan4],
         description: 'longer than 4'
       },
       {
         password: 'Gsasfgasa',
-        passedRules: [RULE.OneLetter, RULE.LongerThan4, RULE.LongerThan8, RULE.UpperAndLower],
+        passedRules: [
+          RULE_CONFIG.OneLetter,
+          RULE_CONFIG.LongerThan4,
+          RULE_CONFIG.LongerThan8,
+          RULE_CONFIG.UpperAndLower
+        ],
         description: 'longer than 8'
       },
       {
         password: '1234567890asd',
         passedRules: [
-          RULE.OneLetter,
-          RULE.LongerThan4,
-          RULE.OneNumber,
-          RULE.LongerThan8,
-          RULE.LongerThan12
+          RULE_CONFIG.OneLetter,
+          RULE_CONFIG.LongerThan4,
+          RULE_CONFIG.OneNumber,
+          RULE_CONFIG.LongerThan8,
+          RULE_CONFIG.LongerThan12
         ],
         description: 'longer than 12'
       },
       {
         password: '#UpperLowerNumb3rLongEnough!',
-        passedRules: Object.values(RULE),
+        passedRules: Object.values(RULE_CONFIG),
         description: 'all rules satisfied'
       }
     ];
@@ -108,7 +113,9 @@ describe('App', () => {
       'with password set to "$password" should indicate $description',
       async ({ password, passedRules }) => {
         expect.hasAssertions();
-        const failedRules = Object.values(RULE).filter((rule) => !passedRules.includes(rule));
+        const failedRules = Object.values(RULE_CONFIG).filter(
+          (rule) => !passedRules.includes(rule)
+        );
 
         await setPasswordTo(password);
 

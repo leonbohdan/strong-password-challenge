@@ -1,70 +1,80 @@
 <script setup>
 import { computed, ref } from 'vue';
-// import { RULE } from '@/domain/password/rules';
+import { RULE_CONFIG } from '@/domain/password/rules';
 import { StrengthOption, StrengthOptionLabel } from '@/domain/password/strength-options';
 
-// const rules = Object.values(RULE);
-
 const rules = {
-  // isOneLetter: (v) => v.length > 0 || 'Must be at least one letter',
-  // isUpperAndLower: (v) => v.length >= 1 || 'Must be at least one lower and one upper case letter',
-  // isOneNumber: (v) => v.length >= 1 || 'Must be at least one number',
-  // isOneSpecialSymbol: (v) => v.length >= 1 || 'Must be at least one special character',
   isOneLetter: (v) => {
-    v.length > 0
-      ? totalValidRules.value.set('OneLetter', 'OneLetter')
-      : totalValidRules.value.delete('OneLetter');
-
-    return v.length > 0;
+    const hasOneLetter = v.length > 0;
+    setOrDeleteRule(hasOneLetter, RULE_CONFIG.OneLetter);
+    return hasOneLetter;
   },
   isUpperAndLower: (v) => {
     const pattern = /(?=.*[a-z])(?=.*[A-Z])/g;
-
-    return pattern.test(v);
+    const hasUpperAndLower = pattern.test(v);
+    setOrDeleteRule(hasUpperAndLower, RULE_CONFIG.UpperAndLower);
+    return hasUpperAndLower;
   },
   isOneNumber: (v) => {
-    const pattern = /\d+/g;
-
-    return pattern.test(v);
+    const pattern = /\d+/;
+    const hasOneNumber = pattern.test(v);
+    setOrDeleteRule(hasOneNumber, RULE_CONFIG.OneNumber);
+    return hasOneNumber;
   },
   isOneSpecialSymbol: (v) => {
-    const pattern = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/g;
-
-    return pattern.test(v);
+    const pattern = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+    const hasOneSpecialSymbol = pattern.test(v);
+    setOrDeleteRule(hasOneSpecialSymbol, RULE_CONFIG.SpecialSymbol);
+    return hasOneSpecialSymbol;
   },
-  isLongerThan4: (v) => v.length > 4,
-  isLongerThan8: (v) => v.length > 8,
-  isLongerThan12: (v) => v.length > 12
+  isLongerThan: (v, n) => {
+    const isLonger = v.length > n;
+    setOrDeleteRule(isLonger, RULE_CONFIG[`LongerThan${n}`]);
+    return isLonger;
+  }
+};
+
+const setOrDeleteRule = (condition, ruleName) => {
+  condition
+    ? totalValidRules.value.set(ruleName, ruleName)
+    : totalValidRules.value.delete(ruleName);
 };
 
 const ruleItems = [
   {
-    name: 'Has at least one letter',
+    name: RULE_CONFIG.OneLetter,
+    description: 'Has at least one letter',
     isValid: (v) => rules.isOneLetter(v)
   },
   {
-    name: 'Has at least one lower and one upper case letter',
+    name: RULE_CONFIG.UpperAndLower,
+    description: 'Has at least one lower and one upper case letter',
     isValid: (v) => rules.isUpperAndLower(v)
   },
   {
-    name: 'Has at least one number',
+    name: RULE_CONFIG.OneNumber,
+    description: 'Has at least one number',
     isValid: (v) => rules.isOneNumber(v)
   },
   {
-    name: 'Has at least one special character',
+    name: RULE_CONFIG.SpecialSymbol,
+    description: 'Has at least one special character',
     isValid: (v) => rules.isOneSpecialSymbol(v)
   },
   {
-    name: 'Has length > 4',
-    isValid: (v) => rules.isLongerThan4(v)
+    name: RULE_CONFIG.LongerThan4,
+    description: 'Has length > 4',
+    isValid: (v) => rules.isLongerThan(v, 4)
   },
   {
-    name: 'Has length > 8',
-    isValid: (v) => rules.isLongerThan8(v)
+    name: RULE_CONFIG.LongerThan8,
+    description: 'Has length > 8',
+    isValid: (v) => rules.isLongerThan(v, 8)
   },
   {
-    name: 'Has length > 12',
-    isValid: (v) => rules.isLongerThan12(v)
+    name: RULE_CONFIG.LongerThan12,
+    description: 'Has length > 12',
+    isValid: (v) => rules.isLongerThan(v, 12)
   }
 ];
 
@@ -73,32 +83,15 @@ const isShowPassword = ref(false);
 const totalValidRules = ref(new Map());
 
 const hintMessage = computed(() => {
-  // const rules = ruleItems.map((isValid) => isValid);
-  //
-  // console.log('rules', rules);
+  const is5OrMoreValidRules = totalValidRules.value.size >= 5;
 
-  return StrengthOptionLabel[StrengthOption.Strong];
+  return is5OrMoreValidRules
+    ? StrengthOptionLabel[StrengthOption.Strong]
+    : StrengthOptionLabel[StrengthOption.Weak];
 });
 </script>
 
 <template>
-  <!--  <div>-->
-  <!--    <input data-test="password-field" v-model="password" />-->
-
-  <!--    <ul>-->
-  <!--      <li-->
-  <!--        v-for="rule in rules"-->
-  <!--        :key="rule"-->
-  <!--        :data-test-rule-indicator="rule"-->
-  <!--        :class="'password-hint__rule password-hint__rule&#45;&#45;fail'"-->
-  <!--      >-->
-  <!--        {{ rule }}-->
-  <!--      </li>-->
-  <!--    </ul>-->
-
-  <!--    <span data-test="validation-summary">Strong or Weak?</span>-->
-  <!--  </div>-->
-
   <v-card elevation="0">
     <v-layout>
       <v-app-bar color="primary">
@@ -109,28 +102,62 @@ const hintMessage = computed(() => {
 
       <v-main>
         <v-container>
-          <v-text-field
-            v-model="password"
-            clearable
-            label="Password"
-            variant="outlined"
-            :append-icon="isShowPassword ? 'mdi-eye' : 'mdi-eye-off'"
-            :rules="[rules.isOneLetter]"
-            :type="isShowPassword ? 'text' : 'password'"
-            :hint="hintMessage"
-            persistent-hint
-            counter
-            @click:append="isShowPassword = !isShowPassword"
-          />
+          <v-row dense>
+            <v-col cols="12" md="6" class="mx-auto">
+              <v-text-field
+                v-model="password"
+                clearable
+                label="Password"
+                variant="outlined"
+                :append-icon="isShowPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                :type="isShowPassword ? 'text' : 'password'"
+                :hint="hintMessage"
+                counter
+                @click:append="isShowPassword = !isShowPassword"
+                @click:clear="password = ''"
+              />
+            </v-col>
+          </v-row>
 
-          <v-list>
-            <v-list-item
-              v-for="item in ruleItems"
-              :key="item.name"
-              :class="['px-0', item.isValid(password) ? 'valid' : 'not-valid']"
-              :title="item.name"
-            />
-          </v-list>
+          <v-row dense>
+            <v-col cols="12" md="6" class="mx-auto">
+              <v-list class="py-0">
+                <v-list-item
+                  v-for="rule in ruleItems"
+                  :key="rule.name"
+                  :class="['px-0', rule.isValid(password) ? 'valid' : 'not-valid']"
+                >
+                  {{ rule.description }}
+                </v-list-item>
+              </v-list>
+            </v-col>
+          </v-row>
+
+          <!--          <v-row>-->
+          <!--            <v-col>-->
+          <!--              <div>-->
+          <!--                <input data-test="password-field" v-model="password" />-->
+
+          <!--                <div data-test="validation-summary">{{ hintMessage }}</div>-->
+
+          <!--                <ul>-->
+          <!--                  <li-->
+          <!--                    v-for="rule in ruleItems"-->
+          <!--                    :key="rule.name"-->
+          <!--                    :data-test-rule-indicator="rule.name"-->
+          <!--                    class="password-hint__rule password-hint__rule&#45;&#45;fail"-->
+          <!--                    :class="[-->
+          <!--                      'px-0',-->
+          <!--                      rule.isValid(password) ? 'valid' : 'not-valid',-->
+          <!--                      `password-hint__rule&#45;&#45;${rule.isValid(password) ? 'pass' : 'fail'}`-->
+          <!--                    ]"-->
+          <!--                  >-->
+          <!--                    {{ rule.description }}-->
+          <!--                  </li>-->
+          <!--                </ul>-->
+          <!--              </div>-->
+          <!--            </v-col>-->
+          <!--          </v-row>-->
         </v-container>
       </v-main>
     </v-layout>

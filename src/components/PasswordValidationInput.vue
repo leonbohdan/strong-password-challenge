@@ -22,7 +22,7 @@ const rules = {
     return hasOneNumber;
   },
   isOneSpecialSymbol: (v) => {
-    const pattern = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+    const pattern = /[ !@~#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
     const hasOneSpecialSymbol = pattern.test(v);
     setOrDeleteRule(hasOneSpecialSymbol, RULE_CONFIG.SpecialSymbol);
     return hasOneSpecialSymbol;

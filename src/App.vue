@@ -92,82 +92,69 @@ const hintMessage = computed(() => {
 </script>
 
 <template>
-  <v-card elevation="0">
-    <v-layout>
-      <v-app-bar color="primary">
-        <v-container>
-          <span class="text-h5">Strong password challenge</span>
-        </v-container>
-      </v-app-bar>
+  <header class="bg-violet-500 text-white">
+    <nav
+      class="md:container md:mx-auto px-4 md:px-0 py-2 md:flex md:items-center md:justify-between"
+    >
+      <div class="min-w-0 flex-1">
+        <h2 class="text-2xl leading-7 sm:truncate sm:text-3xl sm:tracking-tight">
+          Strong password challenge
+        </h2>
+      </div>
+    </nav>
+  </header>
 
-      <v-main>
-        <v-container>
-          <v-row dense>
-            <v-col cols="12" md="6" class="mx-auto">
-              <v-text-field
-                v-model="password"
-                clearable
-                label="Password"
-                variant="outlined"
-                :append-icon="isShowPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                :type="isShowPassword ? 'text' : 'password'"
-                :hint="hintMessage"
-                counter
-                @click:append="isShowPassword = !isShowPassword"
-                @click:clear="password = ''"
-              />
-            </v-col>
-          </v-row>
+  <main class="md:container md:mx-auto px-4 md:px-0 pb-4 md:pb-0 relative z-10">
+    <div class="mt-3 md:mx-auto md:w-1/2 lg:w-1/2 xl:w-1/3">
+      <div>
+        <label for="password" class="block text-sm font-medium leading-6 text-gray-900">
+          Password
+        </label>
 
-          <v-row dense>
-            <v-col cols="12" md="6" class="mx-auto">
-              <v-list class="py-0">
-                <v-list-item
-                  v-for="rule in ruleItems"
-                  :key="rule.name"
-                  :class="['px-0', rule.isValid(password) ? 'valid' : 'not-valid']"
-                >
-                  {{ rule.description }}
-                </v-list-item>
-              </v-list>
-            </v-col>
-          </v-row>
+        <div class="relative mt-2 rounded-md shadow-sm">
+          <input
+            v-model="password"
+            data-test="password-field"
+            :type="isShowPassword ? 'text' : 'password'"
+            name="password"
+            id="password"
+            class="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            placeholder="Password"
+          />
 
-          <!--          <v-row>-->
-          <!--            <v-col>-->
-          <!--              <div>-->
-          <!--                <input data-test="password-field" v-model="password" />-->
+          <div class="absolute inset-y-0 right-0 flex items-center">
+            <button type="button" @click="isShowPassword = !isShowPassword" class="p-1 mr-1">
+              <i :class="['mdi', isShowPassword ? 'mdi-eye' : 'mdi-eye-off']"></i>
+            </button>
+          </div>
+        </div>
+      </div>
 
-          <!--                <div data-test="validation-summary">{{ hintMessage }}</div>-->
+      <div data-test="validation-summary" class="mt-2 ml-3">{{ hintMessage }}</div>
 
-          <!--                <ul>-->
-          <!--                  <li-->
-          <!--                    v-for="rule in ruleItems"-->
-          <!--                    :key="rule.name"-->
-          <!--                    :data-test-rule-indicator="rule.name"-->
-          <!--                    class="password-hint__rule password-hint__rule&#45;&#45;fail"-->
-          <!--                    :class="[-->
-          <!--                      'px-0',-->
-          <!--                      rule.isValid(password) ? 'valid' : 'not-valid',-->
-          <!--                      `password-hint__rule&#45;&#45;${rule.isValid(password) ? 'pass' : 'fail'}`-->
-          <!--                    ]"-->
-          <!--                  >-->
-          <!--                    {{ rule.description }}-->
-          <!--                  </li>-->
-          <!--                </ul>-->
-          <!--              </div>-->
-          <!--            </v-col>-->
-          <!--          </v-row>-->
-        </v-container>
-      </v-main>
-    </v-layout>
-  </v-card>
+      <ul class="mt-3">
+        <li
+          v-for="rule in ruleItems"
+          :key="rule.name"
+          :data-test-rule-indicator="rule.name"
+          class="password-hint__rule password-hint__rule--fail"
+          :class="[
+            'px-0',
+            rule.isValid(password) ? 'valid' : 'not-valid',
+            `password-hint__rule--${rule.isValid(password) ? 'pass' : 'fail'}`
+          ]"
+        >
+          {{ rule.description }}
+        </li>
+      </ul>
+    </div>
+  </main>
 </template>
 
 <style scoped lang="sass">
-:deep(.valid)
+.valid
   color: rgb(76,175,80)
 
-:deep(.not-valid)
+.not-valid
   color: rgb(176,0,32)
 </style>

@@ -9,6 +9,7 @@ export default defineConfig({
   server: {
     port: 8000
   },
+  base: '/strong-password-challenge/',
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

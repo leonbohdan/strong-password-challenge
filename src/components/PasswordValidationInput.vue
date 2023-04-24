@@ -30,11 +30,8 @@ const { password, isShowPassword, hintMessage, ruleItems } = usePasswordValidati
       </div>
     </div>
 
-    <div
-      data-test="validation-summary"
-      :class="['flex justify-between mt-1 mb-4 mx-2 h-3 text-xs', { invisible: !hintMessage }]"
-    >
-      <span>{{ hintMessage }}</span>
+    <div :class="['flex justify-between mt-1 mb-4 mx-2 h-3 text-xs', { invisible: !hintMessage }]">
+      <span data-test="validation-summary">{{ hintMessage }}</span>
 
       <span>{{ password.length }}</span>
     </div>

@@ -84,9 +84,9 @@ export function usePasswordValidation() {
   ];
 
   const hintMessage = computed(() => {
-    const is5OrMoreValidRules = totalValidRules.value.size >= 5;
+    const is5ValidRules = totalValidRules.value.size >= 5;
 
-    return is5OrMoreValidRules
+    return is5ValidRules
       ? StrengthOptionLabel[StrengthOption.Strong]
       : StrengthOptionLabel[StrengthOption.Weak];
   });

@@ -84,6 +84,10 @@ export function usePasswordValidation() {
   ];
 
   const hintMessage = computed(() => {
+    if (!totalValidRules.value.size) {
+      return null;
+    }
+
     const is5ValidRules = totalValidRules.value.size >= 5;
 
     return is5ValidRules
